@@ -21,7 +21,7 @@ public interface ServiceConn {
 
     @FormUrlEncoded
     @POST("/UpdateTemperatura")
-    void updateTemperatura(@Field("ID") int id, @Field("Estado") int estado ,Callback<Boolean> callback);
+    void updateTemperatura(@Field("ID") int id, Callback<Boolean> callback);
 
     @FormUrlEncoded
     @POST("/UpdatePuerta")
@@ -33,6 +33,6 @@ public interface ServiceConn {
 
     @FormUrlEncoded
     @POST("/GetTemperatura")
-    void getTemperatura(@Field("ID") int id, Callback<Boolean> callback);
+    void getTemperatura(@Field("ID") int id, Callback<String> callback);
 
 }

@@ -23,11 +23,12 @@ public class MainActivity extends AppCompatActivity {
     Switch luzSwitch, puertaSwitch;
     int idGrupo = 0;
 
+    public String temperatura = "";
     NotificationCompat.Builder mBuilder =
             (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                     .setSmallIcon(android.R.drawable.ic_notification_clear_all)
                     .setContentTitle("Alerta de Temperatura")
-                    .setContentText("La temperatura esta sobre el ...");
+                    .setContentText("La temperatura actual es: "+temperatura);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,7 +148,20 @@ public class MainActivity extends AppCompatActivity {
         setRepeatingAsyncTask();
     }
 
+    /*
+CREATE DEFINER=`hqqmdit0b3lvs7f3`@`%` PROCEDURE `updateTemperatura`(IN ID smallint)
+BEGIN
+	UPDATE Temperatura t SET t.Estado = 0 WHERE t.ID = ID;
+END
 
+CREATE DEFINER=`hqqmdit0b3lvs7f3`@`%` PROCEDURE `getTemperatura`(IN ID smallint)
+BEGIN
+	SELECT * FROM Temperatura t WHERE t.ID = ID ;
+END
+
+
+
+     */
     private void setRepeatingAsyncTask() {
         final NotificationManager mNotifyMgr =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -160,7 +174,39 @@ public class MainActivity extends AppCompatActivity {
                 handler.post(new Runnable() {
                     public void run() {
                         try {
-                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                            RestAdapter restAdapter = new RestAdapter.Builder()
+                                    .setEndpoint("https://idg2017.herokuapp.com").build();
+                            final ServiceConn serviceConn = restAdapter.create(ServiceConn.class);
+                            serviceConn.getTemperatura(idGrupo, new Callback<String>(){
+                                @Override
+                                public void success(String s, Response response) {
+                                    System.out.println("1"+s+"1");
+                                    if (s != "false") {
+                                        temperatura = s;
+                                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+                                        serviceConn.updateTemperatura(idGrupo, new Callback<Boolean>() {
+                                            @Override
+                                            public void success(Boolean aBoolean, Response response) {
+
+                                            }
+
+                                            @Override
+                                            public void failure(RetrofitError retrofitError) {
+
+                                            }
+                                        });
+                                    }
+                                }
+
+                                @Override
+                                public void failure(RetrofitError retrofitError) {
+
+                                }
+                            });
+
+
+
                         } catch (Exception e) {
                             // error, do something
                         }
