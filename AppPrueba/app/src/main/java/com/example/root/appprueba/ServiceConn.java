@@ -29,7 +29,7 @@ public interface ServiceConn {
 
     @FormUrlEncoded
     @POST("/GetTimbre")
-    void getTimbre(@Field("ID") int id, Callback<Boolean> callback);
+    void getTimbre(@Field("ID") int id, Callback<String> callback);
 
     @FormUrlEncoded
     @POST("/GetTemperatura")
